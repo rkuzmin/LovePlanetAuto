@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Лепросамкопоиск</title>
+<link rel="stylesheet" type="text/css" href="/static/css/trackbar.css" />
+<link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+<script type="text/javascript" src="/static/js/jquery-1.2.3.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.trackbar.js"></script>
+
+<script type="text/javascript">
+function countProfiles(){
+	$.getJSON('/profiles_count', function(response) {
+		$("#profiles_count").text(response['profiles_count']);
+	});
+};
+
+function countViewedProfiles(){
+  $.getJSON('/viewed_profiles_count', function(response) {
+    $("#viewed_profiles_count").text(response['profiles_count']);
+  });
+}
+
+function countLikedProfiles(){
+  $.getJSON('/liked_profiles_count', function(response) {
+    $("#liked_profiles_count").text(response['profiles_count']);
+  });
+};
+
+function visitProfiles(){
+  $.ajax({
+    type: 'GET',
+    url: '/visit_profiles',
+    success: function(response) {
+      if(response == "Moaaar!"){
+        countProfiles();
+        countViewedProfiles();
+        visitProfiles();
+      }
+    }
+  });
+};
+
+function unVisitProfiles(){
+  $.ajax({
+    type: 'GET',
+    url: '/unvisit_profiles',
+    success: function(response) {
+        countProfiles();
+        countViewedProfiles();
+    }
+  });
+};
+
+
+function likeProfiles(){
+  $.ajax({
+    type: 'GET',
+    url: '/like_profiles',
+    success: function(response) {
+      if(response == "Moaaar!"){
+        countProfiles();
+        countLikedProfiles();
+        likeProfiles();
+      }
+    }
+  });
+};
+
+function unLikeProfiles(){
+  $.ajax({
+    type: 'GET',
+    url: '/unlike_profiles',
+    success: function(response) {
+        countProfiles();
+        countLikedProfiles();
+    }
+  });
+};
+
+function getProfiles(){
+  dataString = $("#gogoForm").serializeArray();
+
+  $.ajax({
+    type: 'POST',
+    url: '/get_profiles',
+    data: dataString,
+    dataType: "json",
+    success: function(response) {
+      if(response['next_page'] > 0){
+          $("#data").html('Слелующая страница №' + response['next_page'])
+          $("#page").val(response['next_page']);
+          countProfiles();
+          getProfiles();
+      }
+    }
+  });
+};
+
+$(document).ready(function(){
+	$('#ageSelect').trackbar({
+		onMove : function() {
+			$('#fromAge').val(this.leftValue);
+			$('#toAge').val(this.rightValue);
+		},
+		width : 150, // px
+		leftLimit : 10, // unit of value
+		leftValue : 18, // unit of value
+		rightLimit : 60, // unit of value
+		rightValue : 30, // unit of value
+		showSmallTicks : true,
+		//showBigTicks : true,
+		bigTicks : 1
+	});
+
+	countProfiles();
+  countViewedProfiles();
+  countLikedProfiles();
+	$('#gogo').click(getProfiles);
+  $('#hello').click(visitProfiles);
+  $('#like').click(likeProfiles);
+  $('#unvisit').click(unVisitProfiles);
+  $('#unlike').click(unLikeProfiles);
+});
+
+</script>
+</head>
+
+<body>
+<form action="index.php" method="post" name="gogoForm" id="gogoForm">
+<table border="0" cellspacing="3" cellpadding="3">
+  <tr>
+    <td width="160">Возраст сучечке:</td>
+    <td>
+    	<div id="ageSelect"></div>
+        <input type="hidden" id="fromAge" name="fromAge" value="18"/>
+        <input type="hidden" id="toAge" name="toAge" value="30"/>
+        <input type="hidden" id="page" name="page" value="0"/>
+    </td>
+  </tr>
+  <tr>
+    <td>Где?</td>
+    <td>
+   	  <p>
+    	  <label>
+    	    <input type="radio" checked="checked" name="fromCity" value="region=4312&city=4400" id="where_0" /> <!-- region-4312/city-4400 -->
+    	    Москва</label>
+    	  <br />
+    	  <label>
+    	    <input type="radio" name="fromCity" value="region=4925&city=4962" id="where_1" /> <!-- region-4925/city-4962 -->
+    	    Питер</label>
+    	  <br />
+    </p></td>
+  </tr>
+
+  <tr>
+  	<td>
+   	  <input name="gogo" id="gogo" type="button" value="найти мне новых сучке!" />
+    </td>
+  	<td>
+   	  <input name="hello" id="hello" type="button" value="зайти в профайлы" />
+      <input name="like" id="like" type="button" value="залайкать сучек" />
+    </td>
+  </tr>
+</table>
+</form>
+
+<div id="text">
+	Сучке в базе: <span id="profiles_count"></span><br/>
+  Просмотренных: <span id="viewed_profiles_count"></span><br/>
+  Лайканых: <span id="liked_profiles_count"></span><br/>
+	Что можно сделать:<br />
+    <a href="#" onclick="">удалить всех сучке</a><br />
+    <a href="#" onclick="" id="unvisit">развидеть всех сучке</a><br />
+    <a href="#" onclick="" id="unlike">разлайкать всех сучке</a><br />
+    <a href="#" onclick="countProfiles();countViewedProfiles();">пересчитать моих сучке</a>
+</div>
+<hr/>
+
+<div id="data">
+
+</div>
+</body>
+</html>
