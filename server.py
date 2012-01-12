@@ -194,7 +194,7 @@ class UnvisitProfilesHandler(BaseHandler):
 
 class UnlikeProfilesHandler(BaseHandler):
     def get(self):
-        self.set_profiles_unviewed()
+        self.set_profiles_unliked()
         self.write("OK")
 
 
