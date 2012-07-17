@@ -160,18 +160,15 @@ class VisitProfilesHandler(BaseHandler):
         profiles = self.get_unviewed_profiles()
 
         for profile in profiles:
-            try:
-                print profile['url']
-                req = urllib2.Request(profile['url'])
-                req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
-                req.add_header('Cookie', 'domhit=1; randomhit=1285100440; LP_CH_C=love_cookies; session=' + options.my_session)
-                urllib2.urlopen(req)
-                
+            print profile['url']
+            req = urllib2.Request(profile['url'])
+            req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
+            req.add_header('Cookie', 'domhit=1; randomhit=1285100440; LP_CH_C=love_cookies; session=' + options.my_session)
+            r = urllib2.urlopen(req)
+            if r.code == 302
+                self.delete_profile(profile['id'])
+            else
                 self.set_profile_viewed(profile['id'])
-            except URLError, e:
-                print e.code
-                if e.code == 302:
-                    self.delete_profile(profile['id'])
 
 
         if self.get_unviewed_profiles_count():
@@ -184,17 +181,14 @@ class LikeProfilesHandler(BaseHandler):
         profiles = self.get_unliked_profiles()
 
         for profile in profiles:
-            try:
-                req = urllib2.Request('http://loveplanet.ru/?a=likes&login=' + profile['url'].split('/')[4] + '&likes=1')
-                req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
-                req.add_header('Cookie', 'domhit=1; randomhit=1285100567; LP_CH_C=love_cookies; session=' + options.my_session)
-                urllib2.urlopen(req)
-                
+            req = urllib2.Request('http://loveplanet.ru/?a=likes&login=' + profile['url'].split('/')[4] + '&likes=1')
+            req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
+            req.add_header('Cookie', 'domhit=1; randomhit=1285100567; LP_CH_C=love_cookies; session=' + options.my_session)
+            r = urllib2.urlopen(req)
+            if r.code == 302
+                self.delete_profile(profile['id'])
+            else
                 self.set_profile_liked(profile['id'])
-            except URLError, e:
-                print e.code
-                if e.code == 302:
-                    self.delete_profile(profile['id'])
 
         if self.get_unliked_profiles_count():
             self.write('Moaaar!')
