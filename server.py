@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 import urllib2
+from urllib2 import URLError
 import tornado.httpserver
 import tornado.database
 import tornado.ioloop
@@ -10,7 +11,7 @@ import tornado.web
 from tornado.options import define, options
 from pyquery import PyQuery
 
-define("port", default=8888, help="run on the given port", type=int)
+define("port", default=8080, help="run on the given port", type=int)
 define("mysql_host", default="127.0.0.1:3306", help="mamba database host")
 define("mysql_database", default="lp", help="mamba database name")
 define("mysql_user", default="root", help="mamba database user")
@@ -79,6 +80,9 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def set_profile_viewed(self, id):
         self.db.execute("UPDATE profiles set viewed = 1 where id = %d" % id)
+
+    def delete_profile(self, id):
+        self.db.execute("delete from profiles where id = %d" % id)
 
     def set_profile_liked(self, id):
         self.db.execute("UPDATE profiles set liked = 1 where id = %d" % id)
@@ -156,12 +160,19 @@ class VisitProfilesHandler(BaseHandler):
         profiles = self.get_unviewed_profiles()
 
         for profile in profiles:
-            req = urllib2.Request(profile['url'])
-            req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
-            req.add_header('Cookie', 'domhit=1; randomhit=1285100440; LP_CH_C=love_cookies; session=' + options.my_session)
-            urllib2.urlopen(req)
-            
-            self.set_profile_viewed(profile['id'])
+            try:
+                print profile['url']
+                req = urllib2.Request(profile['url'])
+                req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
+                req.add_header('Cookie', 'domhit=1; randomhit=1285100440; LP_CH_C=love_cookies; session=' + options.my_session)
+                urllib2.urlopen(req)
+                
+                self.set_profile_viewed(profile['id'])
+            except URLError, e:
+                print e.code
+                if e.code == 302:
+                    self.delete_profile(profile['id'])
+
 
         if self.get_unviewed_profiles_count():
             self.write('Moaaar!')
@@ -173,12 +184,17 @@ class LikeProfilesHandler(BaseHandler):
         profiles = self.get_unliked_profiles()
 
         for profile in profiles:
-            req = urllib2.Request('http://loveplanet.ru/?a=likes&login=' + profile['url'].split('/')[4] + '&likes=1')
-            req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
-            req.add_header('Cookie', 'domhit=1; randomhit=1285100567; LP_CH_C=love_cookies; session=' + options.my_session)
-            urllib2.urlopen(req)
-            
-            self.set_profile_liked(profile['id'])
+            try:
+                req = urllib2.Request('http://loveplanet.ru/?a=likes&login=' + profile['url'].split('/')[4] + '&likes=1')
+                req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
+                req.add_header('Cookie', 'domhit=1; randomhit=1285100567; LP_CH_C=love_cookies; session=' + options.my_session)
+                urllib2.urlopen(req)
+                
+                self.set_profile_liked(profile['id'])
+            except URLError, e:
+                print e.code
+                if e.code == 302:
+                    self.delete_profile(profile['id'])
 
         if self.get_unliked_profiles_count():
             self.write('Moaaar!')
