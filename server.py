@@ -123,11 +123,12 @@ class LikedProfilesCountHandler(BaseHandler):
 class GetProfilesHandler(BaseHandler):
     def post(self):
         arg = self.request.arguments
+        #http://loveplanet.ru/?a=search&d=1&pol=1&spol=2&bage=18&tage=28&foto=1&country=3159&region=4312&city=4400&relig=0&p=1&ajax=1
         search_url = 'http://loveplanet.ru/?a=search&d=1&pol=1&spol=2&bage=' + arg['fromAge'][0] + '&tage=' + arg['toAge'][0] + '&foto=1&country=3159&' + arg['fromCity'][0] + '&relig=0&ajax=1&p=' + arg['page'][0]
 
         req = urllib2.Request(search_url)
         req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
-        req.add_header('Cookie', 'domhit=1; randomhit=1285100440; LP_CH_C=love_cookies; session=' + options.my_session)
+        req.add_header('Cookie', 'domhit=1; oper=megafom; randomhit=774133585; CP.mode=B; LP_CH_C=love_cookies; ext_session=' + options.my_session)
 
         r = urllib2.urlopen(req)
         page_html = r.read()
@@ -138,12 +139,12 @@ class GetProfilesHandler(BaseHandler):
         next_page = next_page[-2].split("-")
         next_page = next_page[-1]
 
-        profiles_html = whole_page('.user_data')
+        profiles_html = whole_page('.biglist_row')
         profiles = []
         for profile in profiles_html:
             p = PyQuery(profile)
-            name = p('.name').text()
-            url = 'http://loveplanet.ru' + p('.name').attr('href')
+            name = p('.nickname').text()
+            url = 'http://loveplanet.ru' + p('.nickname').attr('href')
             profiles.append({'name': name, 'url': url})
 
         self.save_profiles(profiles)
@@ -160,14 +161,13 @@ class VisitProfilesHandler(BaseHandler):
         profiles = self.get_unviewed_profiles()
 
         for profile in profiles:
-            print profile['url']
             req = urllib2.Request(profile['url'])
             req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
-            req.add_header('Cookie', 'domhit=1; randomhit=1285100440; LP_CH_C=love_cookies; session=' + options.my_session)
+            req.add_header('Cookie', 'domhit=1; oper=megafom; randomhit=774133585; CP.mode=B; LP_CH_C=love_cookies; ext_session=' + options.my_session)
             r = urllib2.urlopen(req)
-            if r.code == 302
+            if r.code == 302:
                 self.delete_profile(profile['id'])
-            else
+            else:
                 self.set_profile_viewed(profile['id'])
 
 
@@ -183,11 +183,11 @@ class LikeProfilesHandler(BaseHandler):
         for profile in profiles:
             req = urllib2.Request('http://loveplanet.ru/?a=likes&login=' + profile['url'].split('/')[4] + '&likes=1')
             req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
-            req.add_header('Cookie', 'domhit=1; randomhit=1285100567; LP_CH_C=love_cookies; session=' + options.my_session)
+            req.add_header('Cookie', 'domhit=1; oper=megafom; randomhit=774133585; CP.mode=B; LP_CH_C=love_cookies; ext_session=' + options.my_session)
             r = urllib2.urlopen(req)
-            if r.code == 302
+            if r.code == 302:
                 self.delete_profile(profile['id'])
-            else
+            else:
                 self.set_profile_liked(profile['id'])
 
         if self.get_unliked_profiles_count():
