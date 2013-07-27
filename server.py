@@ -17,7 +17,6 @@ define("mysql_host", default="127.0.0.1:3306", help="mamba database host")
 define("mysql_database", default="lp", help="mamba database name")
 define("mysql_user", default="root", help="mamba database user")
 define("mysql_password", default="", help="mamba database password")
-define("my_session", default="", help="loveplanet session")
 
 
 class Application(tornado.web.Application):
@@ -53,47 +52,51 @@ class BaseHandler(tornado.web.RequestHandler):
     def db(self):
         return self.application.db
 
+    @property
+    def my_session(self):
+        return self.get_cookie('ext_session', '').replace('%','%%')
+
     def get_unviewed_profiles_count(self):
-        return self.db.get("SELECT COUNT(*) as profiles_count FROM profiles WHERE viewed = 0")
+        return self.db.get("SELECT COUNT(*) as profiles_count FROM profiles WHERE viewed = 0 and session='%s'" % self.my_session)
 
     def get_viewed_profiles_count(self):
-        return self.db.get("SELECT COUNT(*) as profiles_count FROM profiles WHERE viewed = 1")
+        return self.db.get("SELECT COUNT(*) as profiles_count FROM profiles WHERE viewed = 1 and session='%s'" % self.my_session)
 
 
     def get_unliked_profiles_count(self):
-        return self.db.get("SELECT COUNT(*) as profiles_count FROM profiles WHERE liked = 0")
+        return self.db.get("SELECT COUNT(*) as profiles_count FROM profiles WHERE liked = 0 and session='%s'" % self.my_session)
 
     def get_liked_profiles_count(self):
-        return self.db.get("SELECT COUNT(*) as profiles_count FROM profiles WHERE liked = 1")
+        return self.db.get("SELECT COUNT(*) as profiles_count FROM profiles WHERE liked = 1 and session='%s'" % self.my_session)
 
     def save_profiles(self, profiles):
         for profile in profiles:
             try:
-                self.db.execute("INSERT INTO profiles (url) VALUES ('%s')" % profile['url'])
+                self.db.execute("INSERT INTO profiles (url, session) VALUES ('%s', '%s')" % (profile['url'], self.my_session))
             except Exception:
                 pass
 
     def get_unviewed_profiles(self):
-        return self.db.query("SELECT * FROM profiles WHERE viewed = 0 LIMIT 10")
+        return self.db.query("SELECT * FROM profiles WHERE viewed = 0 and session='%s' LIMIT 10" % self.my_session)
 
     def get_unliked_profiles(self):
-        return self.db.query("SELECT * FROM profiles WHERE liked = 0 and viewed = 1 LIMIT 10")
+        return self.db.query("SELECT * FROM profiles WHERE liked = 0 and viewed = 1 and session='%s' LIMIT 10" % self.my_session)
 
     def set_profile_viewed(self, id):
-        self.db.execute("UPDATE profiles set viewed = 1 where id = %d" % id)
+        self.db.execute("UPDATE profiles set viewed = 1 where id = %d and session='%s'" % (id, self.my_session))
 
     def delete_profile(self, id):
-        self.db.execute("delete from profiles where id = %d" % id)
+        self.db.execute("DELETE from profiles where id = %d and session='%s'" % (id, self.my_session))
 
     def set_profile_liked(self, id):
-        self.db.execute("UPDATE profiles set liked = 1 where id = %d" % id)
+        self.db.execute("UPDATE profiles set liked = 1 where id = %d and session='%s'" % (id, self.my_session))
 
     def set_profiles_unviewed(self):
-        self.db.execute("UPDATE profiles set viewed = 0")
+        self.db.execute("UPDATE profiles set viewed = 0 and session='%s'" % self.my_session)
 
 
     def set_profiles_unliked(self):
-        self.db.execute("UPDATE profiles set liked = 0")
+        self.db.execute("UPDATE profiles set liked = 0 and session='%s'" % self.my_session)
 
 
 class StatusHandler(BaseHandler):
@@ -129,7 +132,7 @@ class GetProfilesHandler(BaseHandler):
 
         req = urllib2.Request(search_url)
         req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
-        req.add_header('Cookie', 'domhit=1; oper=megafom; randomhit=774133585; CP.mode=B; LP_CH_C=love_cookies; session=' + options.my_session)
+        req.add_header('Cookie', 'domhit=1; oper=megafom; randomhit=774133585; CP.mode=B; LP_CH_C=love_cookies; session=' + self.my_session)
 
         r = urllib2.urlopen(req)
         page_html = r.read()
@@ -165,7 +168,7 @@ class VisitProfilesHandler(BaseHandler):
         for profile in profiles:
             req = urllib2.Request(profile['url'])
             req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
-            req.add_header('Cookie', 'domhit=1; oper=megafom; randomhit=774133585; CP.mode=B; LP_CH_C=love_cookies; session=' + options.my_session)
+            req.add_header('Cookie', 'domhit=1; oper=megafom; randomhit=774133585; CP.mode=B; LP_CH_C=love_cookies; session=' + self.my_session)
             try:
                 r = urllib2.urlopen(req,timeout = 2)
             except urllib2.HTTPError, err:
@@ -173,8 +176,11 @@ class VisitProfilesHandler(BaseHandler):
                     self.delete_profile(profile['id'])
 
             self.set_profile_viewed(profile['id'])
-            r.read()
-            r.close()
+            try:
+                r.read()
+                r.close()
+            except:
+                print 'ooops'
 
 
         if self.get_unviewed_profiles_count():
@@ -188,7 +194,7 @@ class LikeProfilesHandler(BaseHandler):
         for profile in profiles:
             req = urllib2.Request('http://loveplanet.ru/a-search/d-1/pol-1/spol-2/foto-1/item-1//ajax-1/login-' + profile['url'].split('/')[4] + '/likes-1')
             req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
-            req.add_header('Cookie', 'domhit=1; oper=megafom; randomhit=774133585; CP.mode=B; LP_CH_C=love_cookies; ext_session=' + options.my_session)
+            req.add_header('Cookie', 'domhit=1; oper=megafom; randomhit=774133585; CP.mode=B; LP_CH_C=love_cookies; ext_session=' + self.my_session)
             try:
                 r = urllib2.urlopen(req,timeout = 2)
             except urllib2.HTTPError, err:
@@ -199,7 +205,7 @@ class LikeProfilesHandler(BaseHandler):
             try:
                 r.close()
             except:
-                print 'Profile cleaned'
+                print 'ooops'
 
         if self.get_unliked_profiles_count():
             self.write('Moaaar!')

@@ -5,4 +5,5 @@ CREATE TABLE `profiles` (
   `url` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `url_unq` (`url`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=9993 DEFAULT CHARSET=utf8
+) ENGINE=InnoDB AUTO_INCREMENT=9993 DEFAULT CHARSET=utf8;
+alter table profiles add column session TEXT default null;
