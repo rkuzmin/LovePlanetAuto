@@ -186,7 +186,7 @@ class LikeProfilesHandler(BaseHandler):
         profiles = self.get_unliked_profiles()
 
         for profile in profiles:
-            req = urllib2.Request('http://loveplanet.ru/?a=likes&login=' + profile['url'].split('/')[4] + '&likes=1')
+            req = urllib2.Request('http://loveplanet.ru/a-search/d-1/pol-1/spol-2/foto-1/item-1//ajax-1/login-' + profile['url'].split('/')[4] + '/likes-1')
             req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
             req.add_header('Cookie', 'domhit=1; oper=megafom; randomhit=774133585; CP.mode=B; LP_CH_C=love_cookies; session=' + options.my_session)
             r = urllib2.urlopen(req)
