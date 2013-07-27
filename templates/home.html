@@ -159,6 +159,7 @@ $(document).ready(function(){
 
   $('#saveCookie').click(function(){
     setCookie('ext_session',$('#ext_session').val(), 365);
+    return false;
   });
 });
 
@@ -166,7 +167,7 @@ $(document).ready(function(){
 </head>
 
 <body>
-<form action="index.php" method="post" name="gogoForm" id="gogoForm">
+<form action="" method="post" name="gogoForm" id="gogoForm">
 <table border="0" cellspacing="3" cellpadding="3">
   <tr>
     <td>
