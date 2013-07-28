@@ -64,7 +64,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 
     def get_unliked_profiles_count(self):
-        return self.db.get("SELECT COUNT(*) as profiles_count FROM profiles WHERE liked = 0 and session='%s'" % self.my_session)
+        return self.db.get("SELECT COUNT(*) as profiles_count FROM profiles WHERE liked != 1 and session='%s'" % self.my_session)
 
     def get_liked_profiles_count(self):
         return self.db.get("SELECT COUNT(*) as profiles_count FROM profiles WHERE liked = 1 and session='%s'" % self.my_session)
