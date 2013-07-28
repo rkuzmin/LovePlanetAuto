@@ -80,7 +80,7 @@ class BaseHandler(tornado.web.RequestHandler):
         return self.db.query("SELECT * FROM profiles WHERE viewed = 0 and session='%s' LIMIT 10" % self.my_session)
 
     def get_unliked_profiles(self):
-        return self.db.query("SELECT * FROM profiles WHERE liked = 0 and viewed = 1 and session='%s' LIMIT 10" % self.my_session)
+        return self.db.query("SELECT * FROM profiles WHERE liked = 0 and session='%s' LIMIT 10" % self.my_session)
 
     def set_profile_viewed(self, id):
         self.db.execute("UPDATE profiles set viewed = 1 where id = %d and session='%s'" % (id, self.my_session))
