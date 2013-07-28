@@ -8,3 +8,4 @@ CREATE TABLE `profiles` (
 ) ENGINE=InnoDB AUTO_INCREMENT=9993 DEFAULT CHARSET=utf8;
 alter table profiles add column session TEXT default null;
 alter table profiles drop index url_unq;
+alter table profiles add unique index(url, session);
