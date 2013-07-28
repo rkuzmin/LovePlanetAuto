@@ -7,3 +7,4 @@ CREATE TABLE `profiles` (
   UNIQUE KEY `url_unq` (`url`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=9993 DEFAULT CHARSET=utf8;
 alter table profiles add column session TEXT default null;
+alter table profiles drop index url_unq;
