@@ -128,7 +128,7 @@ class GetProfilesHandler(BaseHandler):
     def post(self):
         arg = self.request.arguments
         #http://loveplanet.ru/?a=search&d=1&pol=1&spol=2&bage=18&tage=28&foto=1&country=3159&region=4312&city=4400&relig=0&p=1&ajax=1
-        search_url = 'http://loveplanet.ru/?a=search&d=1&pol=1&spol=2&bage=' + arg['fromAge'][0] + '&tage=' + arg['toAge'][0] + '&foto=1&country=3159&' + arg['fromCity'][0] + '&relig=0&ajax=1&p=' + arg['page'][0]
+        search_url = 'http://loveplanet.ru/?a=search&d=1&pol=1&spol=2&bage=' + arg['fromAge'][0] + '&tage=' + arg['toAge'][0] + '&foto=1&' + arg['fromCity'][0] + '&relig=0&ajax=1&p=' + arg['page'][0]
 
         req = urllib2.Request(search_url)
         req.add_header('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')

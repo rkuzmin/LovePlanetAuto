@@ -44,9 +44,9 @@ return c_value;
 }
 
 function countProfiles(){
-	$.getJSON('/profiles_count', function(response) {
-		$("#profiles_count").text(response['profiles_count']);
-	});
+  $.getJSON('/profiles_count', function(response) {
+    $("#profiles_count").text(response['profiles_count']);
+  });
 };
 
 function countViewedProfiles(){
@@ -132,25 +132,25 @@ function getProfiles(){
 };
 
 $(document).ready(function(){
-	$('#ageSelect').trackbar({
-		onMove : function() {
-			$('#fromAge').val(this.leftValue);
-			$('#toAge').val(this.rightValue);
-		},
-		width : 150, // px
-		leftLimit : 10, // unit of value
-		leftValue : 18, // unit of value
-		rightLimit : 60, // unit of value
-		rightValue : 30, // unit of value
-		showSmallTicks : true,
-		//showBigTicks : true,
-		bigTicks : 1
-	});
+  $('#ageSelect').trackbar({
+    onMove : function() {
+      $('#fromAge').val(this.leftValue);
+      $('#toAge').val(this.rightValue);
+    },
+    width : 150, // px
+    leftLimit : 10, // unit of value
+    leftValue : 18, // unit of value
+    rightLimit : 60, // unit of value
+    rightValue : 30, // unit of value
+    showSmallTicks : true,
+    //showBigTicks : true,
+    bigTicks : 1
+  });
 
-	countProfiles();
+  countProfiles();
   countViewedProfiles();
   countLikedProfiles();
-	$('#gogo').click(getProfiles);
+  $('#gogo').click(getProfiles);
   $('#hello').click(visitProfiles);
   $('#like').click(likeProfiles);
   $('#unvisit').click(unVisitProfiles);
@@ -180,7 +180,7 @@ $(document).ready(function(){
   <tr>
     <td width="160">Возраст сучечке:</td>
     <td>
-    	<div id="ageSelect"></div>
+      <div id="ageSelect"></div>
         <input type="hidden" id="fromAge" name="fromAge" value="18"/>
         <input type="hidden" id="toAge" name="toAge" value="30"/>
         <input type="hidden" id="page" name="page" value="0"/>
@@ -189,28 +189,75 @@ $(document).ready(function(){
   <tr>
     <td>Где?</td>
     <td>
-   	  <p>
-    	  <label>
-    	    <input type="radio" checked="checked" name="fromCity" value="region=4312&city=4400" id="where_0" /> <!-- region-4312/city-4400 -->
-    	    Москва</label>
-    	  <br />
-    	  <label>
-    	    <input type="radio" name="fromCity" value="region=4925&city=4962" id="where_1" /> <!-- region-4925/city-4962 -->
-    	    Питер</label>
-    	  <br />
-    	  <label>
-    	    <input type="radio" name="fromCity" value="region=9964&city=9977" id="where_2" /> <!-- region-9964city-9977 -->
-    	    Днепр</label>
-    	  <br />
+      <p>
+        <label>
+          <input type="radio" checked="checked" name="fromCity" value="country=3159&region=4312&city=4400" id="where_0" /> <!-- country-3159region-4312/city-4400 -->
+          Москва</label>
+        <br />
+        <label>
+          <input type="radio" name="fromCity" value="country=3159&region=4925&city=4962" id="where_1" /> <!-- country-3159region-4925/city-4962 -->
+          Питер</label>
+        <br />
+        <label>
+          <input type="radio" name="fromCity" value="country=3159&region=9964&city=9977" id="where_2" /> <!-- country-3159region-9964city-9977 -->
+          Днепр</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=248&region=349&city=269" id="where_3" /> <!-- country-248region-349city-269 -->
+          Минск</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=4891&city=4917" id="where_4" /> <!-- country-3159region-4891city-4917 -->
+          Самара</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=5191&city=5219" id="where_5" /> <!-- country-3159region-5191city-5219 -->
+          Ставрополь</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=4052&city=4079" id="where_6" /> <!-- country-3159region-4052city-4079 -->
+          Краснодар</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=3296&city=3345" id="where_7" /> <!-- country-3159region-3296city-3345 -->
+          Уфа</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=3892&city=3345" id="where_8" /> <!-- country-3159region-3892city-3912 -->
+          Петрозаводск</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=9908&region=10165&city=10184" id="where_9" /> <!-- country-9908region-10165city-10184 -->
+          Киев</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=4503&city=4517" id="where_10" /> <!-- country-3159region-4503city-4517 -->
+          Нижний Новгород</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=9908&region=10504&city=10532" id="where_11" /> <!-- country-9908region-10504city-10532 -->
+          Харьков</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=4800&city=4848" id="where_12" /> <!-- country-3159region-4800city-4848 -->
+          Ростов-на-Дону</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=4528&city=4549" id="where_13" /> <!-- country-3159region-4528city-4549 -->
+          Новосибирск</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=3352&city=3354" id="where_14" /> <!-- country-3159region-3352city-3354 -->
+          Белгород</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=3296&city=5507" id="where_15" /> <!-- country-3159region-5507city-5539 -->
+          Челябинск</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=4633&city=4650" id="where_16" /> <!-- country-3159region-4633city-4650 -->
+          Орел</label>
+          <br />
+           <input type="radio" name="fromCity" value="country=3159&region=3251&city=3283" id="where_17" /> <!-- country-3159region-3251city-3283 -->
+          Астрахань</label>
+          
+          
+        <br />
     </p></td>
   </tr>
 
   <tr>
-  	<td>
-   	  <input name="gogo" id="gogo" type="button" value="найти мне новых сучке!" />
+    <td>
+      <input name="gogo" id="gogo" type="button" value="найти мне новых сучке!" />
     </td>
-  	<td>
-   	  <input name="hello" id="hello" type="button" value="зайти в профайлы" />
+    <td>
+      <input name="hello" id="hello" type="button" value="зайти в профайлы" />
       <input name="like" id="like" type="button" value="залайкать сучек" />
     </td>
   </tr>
@@ -218,10 +265,10 @@ $(document).ready(function(){
 </form>
 
 <div id="text">
-	Сучке в базе: <span id="profiles_count"></span><br/>
+  Сучке в базе: <span id="profiles_count"></span><br/>
   Просмотренных: <span id="viewed_profiles_count"></span><br/>
   Лайканых: <span id="liked_profiles_count"></span><br/>
-	Что можно сделать:<br />
+  Что можно сделать:<br />
     <a href="#" onclick="">удалить всех сучке</a><br />
     <a href="#" onclick="" id="unvisit">развидеть всех сучке</a><br />
     <a href="#" onclick="" id="unlike">разлайкать всех сучке</a><br />
